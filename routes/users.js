@@ -1,14 +1,15 @@
 const express = require('express');
 const User = require('../models/user');
+const passport = require('passport');
 
 const router = express.Router();
-const passport = require('passport');
 
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     res.send('respond with a resource');
 });
+
 router.post('/signup', (req, res) => {
     User.register(
         new User({username: req.body.username}),
