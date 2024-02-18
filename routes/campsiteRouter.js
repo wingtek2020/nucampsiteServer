@@ -2,6 +2,7 @@ const express = require('express');
 const Campsite = require("../models/campsite");
 
 const campsiteRouter = express.Router();
+const authenticate = require('../authenticate');
 
 campsiteRouter.route('/')
     .get((req, res, next) => {
@@ -13,7 +14,7 @@ campsiteRouter.route('/')
             })
             .catch(err => next(err));
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Campsite.create(req.body)
             .then(campsite => {
                 console.log('Campsite Created ', campsite);
@@ -23,11 +24,11 @@ campsiteRouter.route('/')
             })
             .catch(err => next(err));
     })
-    .put((req, res) => {
+    .put(authenticate.verifyUser, (req, res) => {
         res.statusCode = 403;
         res.end('PUT operation not supported on /campsites');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Campsite.deleteMany()
             .then(response => {
                 res.statusCode = 200;
