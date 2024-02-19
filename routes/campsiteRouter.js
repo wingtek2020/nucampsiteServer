@@ -16,7 +16,7 @@ campsiteRouter.route('/')
     .catch(err => next(err));
 })
 
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(authenticate.verifyAdmin, (req, res, next) => {
         Campsite.create(req.body)
             .then(campsite => {
                 console.log('Campsite Created ', campsite);
@@ -26,11 +26,11 @@ campsiteRouter.route('/')
             })
             .catch(err => next(err));
     })
-    .put(authenticate.verifyUser, (req, res) => {
+    .put(authenticate.verifyAdmin, (req, res) => {
         res.statusCode = 403;
         res.end('PUT operation not supported on /campsites');
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(authenticate.verifyAdmin, (req, res, next) => {
         Campsite.deleteMany()
             .then(response => {
                 res.statusCode = 200;
@@ -67,6 +67,11 @@ campsiteRouter.route('/:campsiteId')
             .catch(err => next(err));
     })
     .delete((req, res, next) => {
+        //only do this if the author is the user that is logged in
+        if(req.user._id.equals(req.params.campsiteId)){
+            res.statusCode = 403;
+            res.end(`DELETE operation not supported on /campsites/${req.params.campsiteId}`);
+        }
         Campsite.findByIdAndDelete(req.params.campsiteId)
             .then(response => {
                 res.statusCode = 200;

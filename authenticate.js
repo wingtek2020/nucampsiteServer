@@ -38,3 +38,17 @@ exports.jwtPassport = passport.use(
     )
 );
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+
+exports.verifyAdmin = function(req, res, next) {
+    console.log('User is an admin: ' + req);
+    if (req.user.admin){
+        console.log('User is an admin!');
+        return next();
+
+    }else{
+        const err = new Error('You are not authorized to perform this operation!');
+        console.log(err);
+        err.status = 403;
+        return next(err);
+    }
+};

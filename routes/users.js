@@ -7,9 +7,17 @@ const router = express.Router();
 
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-    res.send('respond with a resource');
-});
+router.get('/', authenticate.verifyAdmin, function(req, res, next) {
+    User.find()
+    .then(campsites => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsites);
+    })
+    .catch(err => next(err));
+})
+
+
 
 router.post('/signup', (req, res) => {
     User.register(
@@ -49,10 +57,11 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
     const token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
+    
     res.json({success: true, token: token, status: 'You are successfully logged in!'});
 });
 
-router.get('/logout', (req, res, next) => {
+router.get('/logout', authenticate.verifyAdmin,(req, res, next) => {
     if (req.session) {
         req.session.destroy();
         res.clearCookie('session-id');
